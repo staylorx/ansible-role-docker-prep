@@ -4,7 +4,7 @@ Prep a RH7 Server for Docker
 
 ## Example Playbook
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+Pretty straight-forward. Install your role anyway you like. Then create a simple playbook with your inventory in a 'servers' (for example):
 
     - hosts: servers
       become: yes
