@@ -1,0 +1,44 @@
+---
+
+- hosts: docker
+  become: yes
+  become_user: root
+  tasks:
+    - yum: 
+        name:    "*"
+        exclude: "kernel*"
+        state:   latest
+    - yum:
+        name: "{{ item }}"
+        state: latest
+      with_items:
+        - epel-release
+        - docker
+    - name: prepare for 64bit, especially for ES
+      sysctl:
+        name: vm.max_map_count
+        value: 262144
+        sysctl_set: yes
+        state: present
+        reload: yes
+    - name: copy over daemon.json
+      template:
+        src: templates/daemon.json.j2
+        dest: /etc/docker/daemon.json
+        mode: 0644
+    - name: copy over subscription-manager
+      template:
+        src: templates/subscription-manager.conf.j2
+        dest: /etc/yum/pluginconf.d/subscription-manager.conf
+        mode: 0644
+    - name: start the service 
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+  handlers:
+    - name: restart docker
+      service:
+        name: docker
+        state: restarted
